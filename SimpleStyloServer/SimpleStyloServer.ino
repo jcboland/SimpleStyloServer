@@ -266,7 +266,6 @@ void displayDisconnected(){
 }
 
 void loop() {
-
   
   WiFiClient client = server.available();   // listen for incoming clients
 
@@ -279,12 +278,14 @@ void loop() {
     String currBTTLine = "";   
     
     while (client.connected()) {            // loop while the client's connected
-
+      
+      //This Loop takes approximately 10ms
+    
       ////////////
       // STEP 1 - Check for incoming messages from the tablet via wifi client
       ////////////
       // Check if the wifi client is available
-      if (client.available()) {
+      while (client.available()) {
         // Read a character
         char c = client.read();             // read a byte, then
         // Add it to the current line       
@@ -293,10 +294,6 @@ void loop() {
         if (c == '\n') {      
           // Send currAndroidLine to the BTT
           Serial2.print(currAndroidLine);
-          if(logCOMM){
-            Serial.print("Android: ");
-            Serial.println(currAndroidLine);
-          }
           // Clear the currAndroidLine
           currAndroidLine = "";
         }
@@ -304,7 +301,7 @@ void loop() {
       ////////////
       // STEP 2 - Check for incoming messages from the BTT
       ////////////
-      if(Serial2.available() > 0){
+      while(Serial2.available() > 0){
         // Read the next available char
         char inChar = Serial2.read();
         // Add it to the running word
@@ -313,11 +310,6 @@ void loop() {
         if(inChar == '\n'){
           // Send it to the Android
           client.print(currBTTLine);
-          // Log the communications
-          if(logCOMM){
-            Serial.print("BTT: ");
-            Serial.println(currBTTLine);
-          }
           // Clear the current line
           currBTTLine = "";
         }
